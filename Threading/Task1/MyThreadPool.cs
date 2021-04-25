@@ -16,6 +16,13 @@ namespace Threading
             _actions.Enqueue(handler);
             return handler;
         }
+        public MyEventHandler QueueUserWorkItem(Action action, CancellationToken token)
+        {
+            action = action ?? throw new ArgumentNullException(nameof(action));
+            var handler = new MyEventHandler(action, token);
+            _actions.Enqueue(handler);
+            return handler;
+        }
         public MyThreadPool()
         {
             _actions = new Queue<MyEventHandler>();
@@ -29,6 +36,10 @@ namespace Threading
             {
                 if (_actions.TryDequeue(out var result))
                 {
+                    if (result.HasCancellactionToken() && result.Token.IsCancellationRequested)
+                    {
+                        continue;
+                    }
                     result.InvokeAction();
                     result.OnFinished?.Invoke(this, EventArgs.Empty);
                 }
