@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Threading
 {
@@ -6,14 +7,14 @@ namespace Threading
     {
         public static void Main(string[] args)
         {
-            var threadPool = new MyThreadPool();
+            var looper = new TaskLooper()
+            {
+                A = () => Console.WriteLine($"Hello from {Thread.CurrentThread.ManagedThreadId}"),
+                Max = 5
+            };
 
-            var handle1 = threadPool.QueueUserWorkItem(() => Console.WriteLine("Hello"));
-            handle1.OnFinished += (o, a) => Console.WriteLine("1 Done");
-            var handle2 = threadPool.QueueUserWorkItem(() => Console.WriteLine(" "));
-            handle2.OnFinished += (o, a) => Console.WriteLine("2 Done");
-            var handle3 = threadPool.QueueUserWorkItem(() => Console.WriteLine("World"));
-            handle3.OnFinished += (o, a) => Console.WriteLine("3 Done");
+            looper.Run(200);
+            looper.Task.Wait();
         }
     }
 }
