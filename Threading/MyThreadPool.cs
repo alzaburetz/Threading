@@ -11,26 +11,30 @@ namespace Threading
     {
         public MyEventHandler QueueUserWorkItem(Action action)
         {
-            if (action is null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-
-            var handler = new MyEventHandler();
-
-            _actions.Add(handler, action);
-
-            lock(lockObject)
-            {
-                action();
-            }
+            action = action ?? throw new ArgumentNullException(nameof(action));
+            var handler = new MyEventHandler(action);
+            _actions.Enqueue(handler);
             return handler;
         }
         public MyThreadPool()
         {
-            _actions = new Dictionary<MyEventHandler, Action>();
+            _actions = new Queue<MyEventHandler>();
+            _myThread = new Thread(() => Work());
+            _myThread.Start();
         }
-        private Dictionary<MyEventHandler, Action> _actions;
-        private object lockObject { get; } = new object();
+
+        private void Work()
+        {
+            while (true)
+            {
+                if (_actions.TryDequeue(out var result))
+                {
+                    result.InvokeAction();
+                    result.OnFinished?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+        private Queue<MyEventHandler> _actions;
+        private Thread _myThread;
     }
 }

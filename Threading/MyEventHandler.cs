@@ -6,14 +6,12 @@ namespace Threading
 {
     public class MyEventHandler
     {
-        public event EventHandler OnFinished;
-        public virtual void OnFinishedCallback(EventArgs args)
+        public Action<object, EventArgs> OnFinished;
+        public MyEventHandler(Action action)
         {
-            EventHandler handler = OnFinished;
-            if (handler != null)
-            {
-                handler(this, args);
-            }
+            _action = action;
         }
+        public void InvokeAction() => _action.Invoke();
+        private readonly Action _action;
     }
 }
