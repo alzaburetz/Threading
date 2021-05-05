@@ -12,13 +12,13 @@ namespace Threading
         {
             var deliver1 = Task.Factory.StartNew(() =>
             {
-                Task.Delay(1000);
+                Thread.Sleep(1000);
                 Console.WriteLine("I delivered 1000 units");
             }, TaskCreationOptions.DenyChildAttach);
 
             var deliver2 = Task.Factory.StartNew(() =>
             {
-                Task.Delay(1500);
+                Thread.Sleep(1500);
                 Console.WriteLine("I delivered 1500 to couriers");
             }, TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -26,13 +26,13 @@ namespace Threading
             {
                 var b1 = Task.Factory.StartNew(() =>
                 {
-                    Task.Delay(500);
+                    Thread.Sleep(500);
                     Console.WriteLine("Deliver B1 delivered 500 units");
                 });
                 var b2 = Task.Factory.StartNew(() =>
                 {
 
-                    Task.Delay(600);
+                    Thread.Sleep(600);
                     Console.WriteLine("Deliver B2 delivered 600 units");
                 });
 
