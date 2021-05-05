@@ -13,7 +13,7 @@ namespace Threading
                 Max = 5
             };
 
-            looper.Run(200);
+            looper.Run();
             looper.Task.Wait();
         }
     }

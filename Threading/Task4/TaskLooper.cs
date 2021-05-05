@@ -10,7 +10,7 @@ namespace Threading
         public int Max;
         public Action A;
         public Task Task => _tcs.Task;
-        public void Run(int delay = 1000)
+        public void Run()
         {
             if (_currentCount == Max)
             {
@@ -19,9 +19,9 @@ namespace Threading
             }
 
             _currentCount++;
-            var task = Task.Delay(delay);
-            task = task.ContinueWith((res) => A(), TaskContinuationOptions.ExecuteSynchronously);
-            task = task.ContinueWith((res) => Run(), TaskContinuationOptions.ExecuteSynchronously);
+            var task = Task.Delay(1000);
+            task.ContinueWith((res) => A(), TaskContinuationOptions.ExecuteSynchronously);
+            task.ContinueWith((res) => Run(), TaskContinuationOptions.ExecuteSynchronously);
         }
         private readonly TaskCompletionSource<object> _tcs = new TaskCompletionSource<object>();
         private int _currentCount;
