@@ -20,7 +20,7 @@ namespace Threading
 
             _currentCount++;
             var task = Task.Delay(1000);
-            task.ContinueWith((res) => A(), TaskContinuationOptions.ExecuteSynchronously);
+            task = task.ContinueWith((res) => A(), TaskContinuationOptions.ExecuteSynchronously);
             task.ContinueWith((res) => Run(), TaskContinuationOptions.ExecuteSynchronously);
         }
         private readonly TaskCompletionSource<object> _tcs = new TaskCompletionSource<object>();
