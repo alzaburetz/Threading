@@ -1,20 +1,23 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Threading;
 
 namespace Threading
 {
     internal class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            var looper = new TaskLooper()
+            MyAwaiter ma = new MyAwaiter();
+            Console.WriteLine($"Run {Thread.CurrentThread.ManagedThreadId}");
+            _ = Task.Run(() =>
             {
-                A = () => Console.WriteLine($"Hello from {Thread.CurrentThread.ManagedThreadId}"),
-                Max = 5
-            };
-
-            looper.Run();
-            looper.Task.Wait();
+                Thread.Sleep(1000);
+                Console.WriteLine($"SetCompleted {Thread.CurrentThread.ManagedThreadId}");
+                ma.SetCompleted();
+            });
+            await ma;
+            Console.WriteLine($"After await {Thread.CurrentThread.ManagedThreadId}");
         }
     }
 }
