@@ -35,7 +35,7 @@ namespace Threading
             return this;
         }
 
-        public bool IsCompleted => true;
+        public bool IsCompleted => _isFinished;
         private Action _onCompleted;
         private bool _isFinished;
     }
