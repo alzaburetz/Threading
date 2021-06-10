@@ -39,7 +39,7 @@ namespace Threading
                 {
                     if (t.IsFaulted)
                     {
-                        tcs.TrySetException();
+                        throw new Exception(); //???????
                     }
                     result[ti] = t.Result;
                     if (0 == Interlocked.Decrement(ref pending))
