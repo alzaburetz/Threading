@@ -16,9 +16,10 @@ namespace Threading
             timer.Elapsed += (sender, args) =>
             {
                 tcs.SetResult(true);
+                (sender as System.Timers.Timer).Dispose();
             };
             timer.Start();
-            return Task.WhenAny(tcs.Task);
+            return tcs.Task;
         }
     }
 }
