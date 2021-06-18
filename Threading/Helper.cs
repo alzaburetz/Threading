@@ -27,27 +27,19 @@ namespace Threading
         {
             var tcs = new TaskCompletionSource<TResult[]>();
             var result = new TResult[tasks.Length];
-            var pending = result.Length;
+
             for (var i = 0; i < tasks.Length; i++)
             {
-                var ti = i;
-                tasks[i].ContinueWith(t =>
-                {
-                    if (t.IsFaulted)
-                    {
-                        throw new Exception(); //???????
-                    }
-                    result[ti] = t.Result;
-                    if (0 == Interlocked.Decrement(ref pending))
-                        tcs.SetResult(result);
-                }, CancellationToken.None,
-                TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Default);
+                tasks[i] = tasks[i].ContinueWith((t) => 
+                { 
+                    t.IsFaulted 
+                    ? tcs.SetResult(result) 
+                    : result[i] = t.Result; 
+                    return t.Result; 
+                });
             }
 
-            //WhenAll WhenAny is only needed!!!
-
-            return tcs.Task;
+            return Task.WhenAll(tasks);
         }
     }
 }
