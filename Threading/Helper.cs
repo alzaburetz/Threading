@@ -8,14 +8,14 @@ namespace Threading
 {
     public static class Helper
     {
-        public static Task<Task<TResult>> WithCancellation<TResult>(this Task<TResult> task, CancellationToken ct)
+        public static Task<TResult> WithCancellation<TResult>(this Task<TResult> task, CancellationToken ct)
         {
             var tcs = new TaskCompletionSource<TResult>();
             ct.Register(() =>
             {
                 tcs.SetResult(default(TResult));
             });
-            return Task.WhenAny(tcs.Task, task);
+            return Task.Run(async () => await await Task.WhenAny(tcs.Task, task));
         }
 
         public static Task<TResult[]> WhenAllOrError<TResult>(params Task<TResult>[] tasks)
