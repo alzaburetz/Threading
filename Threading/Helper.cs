@@ -8,18 +8,14 @@ namespace Threading
 {
     public static class Helper
     {
-        public static async Task<TResult> WithCancellation<TResult>(this Task<TResult> task, CancellationToken ct)
+        public static Task<Task<TResult>> WithCancellation<TResult>(this Task<TResult> task, CancellationToken ct)
         {
-            if (task == null)
-                throw new ArgumentNullException(nameof(task));
-
-            while (!task.IsCompleted)
+            var tcs = new TaskCompletionSource<TResult>();
+            ct.Register(() =>
             {
-                await Task.Delay(30);
-                ct.ThrowIfCancellationRequested();
-            }
-
-            return await task;
+                tcs.SetResult(default(TResult));
+            });
+            return Task.WhenAny(tcs.Task, task);
         }
 
         public static Task<TResult[]> WhenAllOrError<TResult>(params Task<TResult>[] tasks)
@@ -48,6 +44,8 @@ namespace Threading
                 TaskContinuationOptions.ExecuteSynchronously,
                 TaskScheduler.Default);
             }
+
+            //WhenAll WhenAny is only needed!!!
 
             return tcs.Task;
         }
