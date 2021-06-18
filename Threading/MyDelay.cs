@@ -9,13 +9,13 @@ namespace Threading
 {
     public static class MyDelayClass
     {
-        public static Task MyDelay(int delay, CancellationToken ct = default(CancellationToken))
+        public static Task MyDelay(int delay)
         {
-            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSource();
             var timer = new System.Timers.Timer(delay);
             timer.Elapsed += (sender, args) =>
             {
-                tcs.SetResult(true);
+                tcs.SetResult();
                 (sender as System.Timers.Timer).Dispose();
             };
             timer.Start();
