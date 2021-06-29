@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Linq;
 
 namespace Threading
 {
@@ -26,23 +27,21 @@ namespace Threading
         static Task<TResult[]> WhenAllOrErrorImplementation<TResult>(Task<TResult>[] tasks, CancellationToken token = default(CancellationToken))
         {
             var tcs = new TaskCompletionSource<TResult[]>();
-            var result = new List<TResult>(tasks.Length);
+            var result = new TResult[tasks.Length];
 
-            for (var i = 0; i < tasks.Length - 1; i++)
-            {
-                tasks[i] = tasks[i].ContinueWith((t) => 
+            var newTasks = tasks
+                .Select((task, index) => task.ContinueWith((t) =>
                 {
                     if (t.IsFaulted)
                     {
-                        tcs.SetResult(result.ToArray());
+                        tcs.TrySetResult(result);
                         return default;
                     }
-                    result.Add(t.Result);
+                    result[index] = t.Result;
                     return t.Result;
-                }, token);
-            }
+                }));
 
-            return Task.WhenAny(Task.WhenAll(tasks), tcs.Task).Unwrap();
+            return Task.WhenAny(Task.WhenAll(newTasks), tcs.Task).Unwrap();
         }
     }
 }
